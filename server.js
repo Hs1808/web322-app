@@ -1,18 +1,19 @@
-
 const express = require('express');
+const path = require('path');
 const storeService = require('./store-service');
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+app.use(express.static('public'));
 
-storeService.initialize()
-    .then(() => {
-        console.log("Data successfully initialized");
-    })
-    .catch((err) => {
-        console.error(`Initialization failed: ${err}`);
-    });
+app.get('/', (req, res) => {
+    res.redirect('/about');
+});
 
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'about.html'));
+});
 
 app.get('/items', (req, res) => {
     storeService.getAllItems()
@@ -20,10 +21,9 @@ app.get('/items', (req, res) => {
             res.json(items);
         })
         .catch((err) => {
-            res.status(500).json({ error: err });
+            res.status(500).json({ message: err });
         });
 });
-
 
 app.get('/shop', (req, res) => {
     storeService.getPublishedItems()
@@ -31,10 +31,9 @@ app.get('/shop', (req, res) => {
             res.json(publishedItems);
         })
         .catch((err) => {
-            res.status(500).json({ error: err });
+            res.status(500).json({ message: err });
         });
 });
-
 
 app.get('/categories', (req, res) => {
     storeService.getCategories()
@@ -42,15 +41,21 @@ app.get('/categories', (req, res) => {
             res.json(categories);
         })
         .catch((err) => {
-            res.status(500).json({ error: err });
+            res.status(500).json({ message: err });
         });
 });
 
-
-initialize().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Express http server listening on port ${PORT}`);
-    });
-}).catch(err => {
-    console.error(err);
+app.use((req, res) => {
+    res.status(404).send("Page Not Found");
 });
+
+
+storeService.initialize()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Express http server listening on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.log(`Unable to start the server: ${err}`);
+    });
