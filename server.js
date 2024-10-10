@@ -1,3 +1,14 @@
+/*********************************************************************************
+WEB322 – Assignment 02
+I declare that this assignment is my own work in accordance with Seneca Academic Policy. No part * of this assignment has
+been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
+Name: Harshdeep Singh
+Student ID: 171289218
+Date: October 9th, 2024
+Glitch Web App URL: https://web322-app-harshdeep-singh.glitch.me
+GitHub Repository URL: https://github.com/Hs1808/web322-app
+********************************************************************************/
+
 const express = require('express');
 const path = require('path');
 const storeService = require('./store-service');
