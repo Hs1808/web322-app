@@ -18,13 +18,13 @@ const streamifier = require("streamifier");
 const storeService = require("./store-service");
 const exphbs = require("express-handlebars");
 
-// Load environment variables
+
 dotenv.config();
 
-// Initialize the Express app
+
 const app = express();
 
-// Handlebars setup
+
 app.engine(
     ".hbs",
     exphbs.engine({
@@ -40,12 +40,12 @@ app.engine(
             return options.fn(this);
           }
         },
-        // Register the ifEquals helper
+        
         ifEquals: function (a, b, options) {
           if (a == b) {
-            return options.fn(this); // Renders the block if a == b
+            return options.fn(this); 
           } else {
-            return options.inverse(this); // Otherwise, renders the inverse block
+            return options.inverse(this); 
           }
         },
       },
@@ -53,7 +53,6 @@ app.engine(
   );
   app.set("view engine", ".hbs");
 
-// Cloudinary configuration
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -63,10 +62,10 @@ cloudinary.config({
 
 const upload = multer();
 
-// Middleware for serving static files
+
 app.use(express.static("public"));
 
-// Middleware to set the active route for Handlebars
+
 app.use((req, res, next) => {
   let route = req.path.substring(1);
   app.locals.activeRoute =
@@ -78,10 +77,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Define the port
+
 const PORT = process.env.PORT || 8080;
 
-// Routes
+
 
 app.get("/", (req, res) => {
   res.redirect("/shop");
@@ -144,18 +143,18 @@ app.get("/categories", (req, res) => {
     let categories = [];
     let message = "";
   
-    // Fetch categories first
+   
     storeService.getCategories()
       .then((allCategories) => {
         categories = allCategories;
   
-        // Get published items filtered by category if a category is selected
+       
         if (category) {
           storeService
             .getPublishedItemsByCategory(category)
             .then((filteredItems) => {
               posts = filteredItems;
-              post = posts[0]; // Show the first post
+              post = posts[0]; 
               res.render("shop", {
                 post,
                 items: posts,
@@ -174,12 +173,12 @@ app.get("/categories", (req, res) => {
               });
             });
         } else {
-          // If no category is selected, show all published items
+        
           storeService
             .getPublishedItems()
             .then((allItems) => {
               posts = allItems;
-              post = posts[0]; // Show the first post
+              post = posts[0]; 
               res.render("shop", {
                 post,
                 items: posts,
@@ -211,7 +210,7 @@ app.get("/categories", (req, res) => {
   
     storeService.getItemById(itemId)
       .then((item) => {
-        // Render the existing shop.hbs with a single item as the array
+        
         res.render('shop', { items: [item], title: `Shop - Item ${itemId}`, currentPath: req.path });
       })
       .catch((err) => {
@@ -244,7 +243,7 @@ app.get('/items/:id', (req, res) => {
 
   storeService.getItemById(itemId)
     .then((item) => {
-      // Render the existing items.hbs with a single item as the array
+      
       res.render('items', { items: [item], title: `Item ${itemId}`, currentPath: req.path });
     })
     .catch((err) => {
@@ -253,12 +252,12 @@ app.get('/items/:id', (req, res) => {
 });
 
 
-// 404 handler
+
 app.use((req, res) => {
   res.status(404).render("404", { title: "Page Not Found" });
 });
 
-// Initialize the store service and start the server
+
 storeService
   .initialize()
   .then(() => {
