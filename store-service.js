@@ -58,19 +58,19 @@ function getCategories() {
 
 function addItem(itemData) {
     return new Promise((resolve) => {
-        // Assign a new id based on the length of the items array
+        
         itemData.id = items.length + 1;
 
-        // Set published to true if 'on' (for checkboxes), else false
+        
         itemData.published = itemData.published === 'on';
 
-        // Set postDate to the current date in YYYY-MM-DD format
-        itemData.postDate = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        
+        itemData.postDate = new Date().toISOString().split('T')[0]; 
 
-        // Push the new item to the items array
+        
         items.push(itemData);
 
-        // Resolve the promise with the itemData (the newly added item)
+        
         resolve(itemData);
     });
 }
@@ -102,10 +102,10 @@ function getItemsByMinDate(minDateStr) {
       });
 }
 
-// Add this function to store-service.js
+
 function getPublishedItemsByCategory(category) {
     return new Promise((resolve, reject) => {
-      // Filter items that are both published and match the given category
+      
       const filteredItems = items.filter(
         (item) => item.published && item.category == category
       );
@@ -117,11 +117,7 @@ function getPublishedItemsByCategory(category) {
     });
   }
   
-  module.exports = {
-    // other exported functions
-    getPublishedItemsByCategory,
-  };
-  
+ 
 
 module.exports = {
     initialize,
