@@ -1,22 +1,62 @@
 [
-    {
-       "id":1,
-       "category":"Home, Garden"
-    },
-    {
-       "id":2,
-       "category":"Electronics, Computers, Video Games"
-    },
-    {
-       "id":3,
-       "category":"Clothing"
-    },
-    {
-       "id":4,
-       "category":"Sports & Outdoors"
-    },
-    {
-       "id":5,
-       "category":"Pets"
-    }
- ]
+   {
+       "id": 1,
+       "category": "Home & Garden"
+   },
+   {
+       "id": 2,
+       "category": "Electronics, Computers, Video Games"
+   },
+   {
+       "id": 3,
+       "category": "Clothing"
+   },
+   {
+       "id": 4,
+       "category": "Sports & Outdoors"
+   },
+   {
+       "id": 5,
+       "category": "Pets"
+   },
+   {
+       "id": 6,
+       "category": "Garden Equipment"
+   },
+   {
+       "id": 7,
+       "category": "Mobile Accessories"
+   },
+   {
+       "id": 8,
+       "category": "Office Equipment"
+   },
+   {
+       "id": 9,
+       "category": "Home Appliances"
+   },
+   {
+       "id": 10,
+       "category": "Air Purifiers & Water Filters"
+   },
+   {
+       "id": 11,
+       "category": "Luxury"
+   },
+   {
+       "id": 12,
+       "category": "Fitness & Health"
+   },
+   {
+       "id": 13,
+       "category": "Bags & Accessories"
+   },
+   {
+       "id": 14,
+       "category": "Footwear"
+   },
+   {
+       "id": 15,
+       "category": "Wearables"
+   }
+]
