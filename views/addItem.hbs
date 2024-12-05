@@ -1,26 +1,53 @@
-<div class="container">
-    <h1>Add New Item</h1>
-    <form action="/items/add" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
-        </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="number" step="0.01" class="form-control" id="price" name="price" required>
-        </div>
-        <div class="mb-3">
-            <label for="category" class="form-label">Category</label>
-            <input type="number" class="form-control" id="category" name="category" required>
-        </div>
-        <div class="mb-3">
-            <label for="featureImage" class="form-label">Feature Image</label>
-            <input type="file" class="form-control" id="featureImage" name="featureImage">
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="published" name="published">
-            <label class="form-check-label" for="published">Published</label>
-        </div>
-        <button type="submit" class="btn btn-primary mt-3">Add Item</button>
-    </form>
-</div>
+<body>
+    <div class="container" style="padding-top: 90px;">
+        <h2>{{title}}</h2>
+        <hr>
+
+        <form action="/items/add" method="POST" enctype="multipart/form-data">
+            <!-- Item Title -->
+            <div class="mb-3">
+                <label for="title" class="form-label">Item Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+
+            <!-- Category Selection -->
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                {{#if categories}}
+                    <select class="form-control" name="category" id="category" required>
+                        <option value="">Select Category</option>
+                        {{#each categories}}
+                            <option value="{{id}}">{{category}}</option>
+                        {{/each}}
+                    </select>
+                {{else}}
+                    <div>No Categories</div>
+                {{/if}}
+            </div>
+
+            <!-- Price Field -->
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input type="number" class="form-control" id="price" name="price" required>
+            </div>
+
+            <!-- Feature Image -->
+            <div class="mb-3">
+                <label for="featureImage" class="form-label">Feature Image</label>
+                <input type="file" class="form-control" id="featureImage" name="featureImage">
+            </div>
+
+            <!-- Published Checkbox -->
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="published" name="published">
+                <label class="form-check-label" for="published">Published</label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary mt-3">Add Item</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+</body>
+</html>

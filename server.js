@@ -1,7 +1,7 @@
 /*********************************************************************************
-WEB322 – Assignment 04
-I declare that this assignment is my own work in accordance with Seneca Academic Policy. No part * of this assignment has
-been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
+WEB322 – Assignment 05
+I declare that this assignment is my own work in accordance with Seneca Academic Policy. No part
+of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
 Name: Harshdeep Singh
 Student ID: 171289218
 Date: October 9th, 2024
@@ -10,7 +10,6 @@ GitHub Repository URL: https://github.com/Hs1808/web322-app
 ********************************************************************************/
 
 const express = require("express");
-const path = require("path");
 const dotenv = require("dotenv");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
@@ -18,40 +17,36 @@ const streamifier = require("streamifier");
 const storeService = require("./store-service");
 const exphbs = require("express-handlebars");
 
-
 dotenv.config();
 
-
 const app = express();
+const PORT = process.env.PORT || 8080;
 
-
+// Setup Handlebars
 app.engine(
-    ".hbs",
-    exphbs.engine({
-      extname: ".hbs",
-      helpers: {
-        navLink: function (url, options) {
-          return url === this.activeRoute ? "active" : "";
-        },
-        equal: function (lvalue, rvalue, options) {
-          if (lvalue !== rvalue) {
-            return options.inverse(this);
-          } else {
-            return options.fn(this);
-          }
-        },
-        
-        ifEquals: function (a, b, options) {
-          if (a == b) {
-            return options.fn(this); 
-          } else {
-            return options.inverse(this); 
-          }
-        },
+  ".hbs",
+  exphbs.engine({
+    extname: ".hbs",
+    helpers: {
+      navLink: function (url, options) {
+        return url === this.activeRoute ? "active" : "";
       },
-    })
-  );
-  app.set("view engine", ".hbs");
+      equal: function (lvalue, rvalue, options) {
+        return lvalue === rvalue ? options.fn(this) : options.inverse(this);
+      },
+      ifEquals: function (a, b, options) {
+        return a == b ? options.fn(this) : options.inverse(this);
+      },
+      formatDate: function (dateObj) {
+        let year = dateObj.getFullYear();
+        let month = (dateObj.getMonth() + 1).toString();
+        let day = dateObj.getDate().toString();
+        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      },
+    },
+  })
+);
+app.set("view engine", ".hbs");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -62,10 +57,10 @@ cloudinary.config({
 
 const upload = multer();
 
-
+// Static middleware
 app.use(express.static("public"));
 
-
+// Middleware to track active route
 app.use((req, res, next) => {
   let route = req.path.substring(1);
   app.locals.activeRoute =
@@ -77,23 +72,148 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middleware to handle URL-encoded bodies (for forms like adding a category)
+app.use(express.urlencoded({ extended: true }));
 
-const PORT = process.env.PORT || 8080;
-
-
-
+// Redirect root to /shop
 app.get("/", (req, res) => {
   res.redirect("/shop");
 });
 
+// About route
 app.get("/about", (req, res) => {
   res.render("about", { title: "About Us" });
 });
 
-app.get("/items/add", (req, res) => {
-  res.render("addItem", { title: "Add Item" });
+// Shop routes
+app.get("/shop", (req, res) => {
+  const { category } = req.query;
+
+  let categories = [];
+  let items = [];
+  let selectedItem = null;
+
+  storeService
+    .getCategories()
+    .then((cats) => {
+      categories = cats;
+      return category
+        ? storeService.getPublishedItemsByCategory(category)
+        : storeService.getPublishedItems();
+    })
+    .then((publishedItems) => {
+      items = publishedItems;
+      selectedItem = items.length > 0 ? items[0] : null;
+      res.render("shop", {
+        categories,
+        items,
+        selectedItem,
+        viewingCategory: category,
+        title: "Shop",
+        message: items.length === 0 ? "No items available." : null,
+      });
+    })
+    .catch((err) => {
+      res.render("shop", {
+        categories,
+        message: "Unable to retrieve shop data.",
+        title: "Shop",
+      });
+    });
 });
 
+app.get("/shop/:id", (req, res) => {
+  const itemId = req.params.id;
+
+  let categories = [];
+  let selectedItem = null;
+
+  storeService
+    .getCategories()
+    .then((cats) => {
+      categories = cats;
+      return storeService.getItemById(itemId);
+    })
+    .then((item) => {
+      selectedItem = item;
+      res.render("shop", {
+        categories,
+        selectedItem,
+        items: [item],
+        title: `Shop - Item ${itemId}`,
+      });
+    })
+    .catch((err) => {
+      res.status(404).render("404", { title: "Item Not Found", message: err });
+    });
+});
+
+// Items routes
+app.get("/items", (req, res) => {
+  const { category, minDate } = req.query;
+
+  let promise;
+
+  if (category) {
+    promise = storeService.getItemsByCategory(category);
+  } else if (minDate) {
+    promise = storeService.getItemsByMinDate(minDate);
+  } else {
+    promise = storeService.getAllItems();
+  }
+
+  promise
+    .then((items) => {
+      if (items.length > 0) {
+        res.render("items", { items, title: "Items" });
+      } else {
+        res.render("items", { message: "No items found", title: "Items" });
+      }
+    })
+    .catch(() => {
+      res.render("items", { message: "No items found", title: "Items" });
+    });
+});
+
+// Categories route
+app.get("/categories", (req, res) => {
+  storeService
+    .getCategories()
+    .then((categories) => {
+      if (categories.length > 0) {
+        res.render("categories", { categories, title: "Categories" });
+      } else {
+        res.render("categories", { message: "No categories found", title: "Categories" });
+      }
+    })
+    .catch(() => {
+      res.render("categories", { message: "No categories found", title: "Categories" });
+    });
+});
+
+// Add Category route (GET)
+app.get("/categories/add", (req, res) => {
+  res.render("addCategory", { title: "Add Category" });
+});
+
+// Add Category route (POST)
+app.post("/categories/add", (req, res) => {
+  storeService
+    .addCategory(req.body)
+    .then(() => res.redirect("/categories"))
+    .catch((err) => res.status(500).send("Unable to add category: " + err));
+});
+
+// Delete Category route
+app.get("/categories/delete/:id", (req, res) => {
+  const categoryId = req.params.id;
+
+  storeService
+    .deleteCategoryById(categoryId)
+    .then(() => res.redirect("/categories"))
+    .catch((err) => res.status(500).send("Unable to remove category: " + err));
+});
+// Add Item Route - POST
 app.post("/items/add", upload.single("featureImage"), (req, res) => {
   if (req.file) {
     let streamUpload = (req) => {
@@ -129,142 +249,45 @@ app.post("/items/add", upload.single("featureImage"), (req, res) => {
       .catch((err) => res.status(500).json({ message: err }));
   }
 });
-app.get("/categories", (req, res) => {
-    storeService
+
+// Add Item Route - GET
+app.get("/items/add", (req, res) => {
+  storeService
       .getCategories()
-      .then((categories) => res.render("categories", { categories, title: "Categories" }))
-      .catch((err) => res.render("categories", { message: "No categories found" }));
-  });
-  
-  app.get("/shop", (req, res) => {
-    const { category } = req.query;
-    let post = null;
-    let posts = [];
-    let categories = [];
-    let message = "";
-  
-   
-    storeService.getCategories()
-      .then((allCategories) => {
-        categories = allCategories;
-  
-       
-        if (category) {
-          storeService
-            .getPublishedItemsByCategory(category)
-            .then((filteredItems) => {
-              posts = filteredItems;
-              post = posts[0]; 
-              res.render("shop", {
-                post,
-                items: posts,
-                categories,
-                viewingCategory: category,
-                title: "Shop",
-                message,
-              });
-            })
-            .catch((err) => {
-              message = err;
-              res.render("shop", {
-                message,
-                categories,
-                title: "Shop",
-              });
-            });
-        } else {
-        
-          storeService
-            .getPublishedItems()
-            .then((allItems) => {
-              posts = allItems;
-              post = posts[0]; 
-              res.render("shop", {
-                post,
-                items: posts,
-                categories,
-                viewingCategory: category,
-                title: "Shop",
-                message,
-              });
-            })
-            .catch((err) => {
-              message = err;
-              res.render("shop", {
-                message,
-                categories,
-                title: "Shop",
-              });
-            });
-        }
+      .then((categories) => {
+          // Render the addItem view with categories if they exist
+          res.render("addItem", { categories: categories, title: "Add Item" });
       })
       .catch((err) => {
-        message = "Unable to retrieve categories";
-        res.render("shop", { message, title: "Shop" });
+          // If categories could not be fetched, render with empty categories
+          res.render("addItem", { categories: [], title: "Add Item" });
       });
-  });
-  
-
-  app.get('/shop/:id', (req, res) => {
-    const itemId = req.params.id;
-  
-    storeService.getItemById(itemId)
-      .then((item) => {
-        
-        res.render('shop', { items: [item], title: `Shop - Item ${itemId}`, currentPath: req.path });
-      })
-      .catch((err) => {
-        res.status(404).render('404', { message: err, title: 'Item Not Found', currentPath: req.path });
-      });
-  });
-
-app.get("/items", (req, res) => {
-  const { category, minDate } = req.query;
-  if (category) {
-    storeService
-      .getItemsByCategory(category)
-      .then((items) => res.render("items", { items, title: "Items" }))
-      .catch((err) => res.render("items", { message: "No items found" }));
-  } else if (minDate) {
-    storeService
-      .getItemsByMinDate(minDate)
-      .then((items) => res.render("items", { items, title: "Items" }))
-      .catch((err) => res.render("items", { message: "No items found" }));
-  } else {
-    storeService
-      .getAllItems()
-      .then((items) => res.render("items", { items, title: "Items" }))
-      .catch((err) => res.render("items", { message: "No items found" }));
-  }
 });
 
-app.get('/items/:id', (req, res) => {
+
+// Delete Item route
+app.get("/items/delete/:id", (req, res) => {
   const itemId = req.params.id;
 
-  storeService.getItemById(itemId)
-    .then((item) => {
-      
-      res.render('items', { items: [item], title: `Item ${itemId}`, currentPath: req.path });
-    })
-    .catch((err) => {
-      res.status(404).render('404', { message: err, title: 'Item Not Found', currentPath: req.path });
-    });
+  storeService
+    .deletePostById(itemId)
+    .then(() => res.redirect("/items"))
+    .catch((err) => res.status(500).send("Unable to remove item: " + err));
 });
 
-
-
+// 404 Page
 app.use((req, res) => {
   res.status(404).render("404", { title: "Page Not Found" });
 });
 
-
+// Start server
 storeService
   .initialize()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Express http server listening on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.log(`Unable to start the server: ${err}`);
+    console.error(`Unable to start server: ${err}`);
   });

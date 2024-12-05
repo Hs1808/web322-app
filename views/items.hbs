@@ -29,6 +29,9 @@
                 <td>{{price}}</td>
                 <td><a href="/items?category={{category}}">{{category}}</a></td>
                 <td>{{#if published}}Yes{{else}}No{{/if}}</td>
+                <td>
+                  <a href="/items/delete/{{id}}" class="btn btn-danger">Remove</a>
+                </td>
               </tr>
             {{/each}}
           </tbody>
