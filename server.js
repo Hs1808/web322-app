@@ -16,9 +16,22 @@ const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const storeService = require("./store-service");
 const exphbs = require("express-handlebars");
-const { Sequelize, DataTypes } = require("sequelize");
 
-dotenv.config();
+const { Sequelize, DataTypes } = require("sequelize");
+require("dotenv").config(); // Ensure environment variables are loaded
+
+// Update this connection string to use the environment variables for Vercel deployment
+const sequelize = new Sequelize(
+  'postgresql://SenecaDB_owner:vWeLmI9Th2Qk@ep-dawn-glitter-a5vro309.us-east-2.aws.neon.tech/SenecaDB?sslmode=require', {
+  dialectModule: require('pg'), // This specifies the dialect module (pg)
+  dialect: 'postgres', // Use PostgreSQL as the database dialect
+  port: process.env.DB_PORT || 5432, // Default port for PostgreSQL
+  dialectOptions: {
+    ssl: { rejectUnauthorized: false }, // Needed for Vercel, for secure connection
+  },
+  query: { raw: true }
+});
+
 
 const app = express();
 const PORT = process.env.PORT || 8080;
