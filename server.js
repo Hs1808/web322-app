@@ -16,6 +16,7 @@ const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const storeService = require("./store-service");
 const exphbs = require("express-handlebars");
+const { Sequelize, DataTypes } = require("sequelize");
 
 dotenv.config();
 
