@@ -4,13 +4,13 @@
         <hr>
 
         <form action="/items/add" method="POST" enctype="multipart/form-data">
-            <!-- Item Title -->
+            
             <div class="mb-3">
                 <label for="title" class="form-label">Item Title</label>
                 <input type="text" class="form-control" id="title" name="title" required>
             </div>
 
-            <!-- Category Selection -->
+           
             <div class="mb-3">
                 <label for="category" class="form-label">Category</label>
                 {{#if categories}}
@@ -25,25 +25,25 @@
                 {{/if}}
             </div>
 
-            <!-- Price Field -->
+          
             <div class="mb-3">
                 <label for="price" class="form-label">Price</label>
                 <input type="number" class="form-control" id="price" name="price" required>
             </div>
 
-            <!-- Feature Image -->
+            
             <div class="mb-3">
                 <label for="featureImage" class="form-label">Feature Image</label>
                 <input type="file" class="form-control" id="featureImage" name="featureImage">
             </div>
 
-            <!-- Published Checkbox -->
+            
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="published" name="published">
                 <label class="form-check-label" for="published">Published</label>
             </div>
 
-            <!-- Submit Button -->
+            
             <button type="submit" class="btn btn-primary mt-3">Add Item</button>
         </form>
     </div>

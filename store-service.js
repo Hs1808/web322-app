@@ -105,10 +105,8 @@ function addItem(itemData) {
             if (itemData[key] === "") itemData[key] = null;
         }
 
-        // Assign the current date to postDate
         itemData.postDate = new Date();
 
-        // Create the item in the database
         Item.create(itemData)
             .then((data) => resolve(data))
             .catch(() => reject("Unable to create item"));
@@ -139,12 +137,10 @@ function getCategories() {
 // Add a new category
 function addCategory(categoryData) {
     return new Promise((resolve, reject) => {
-        // Replace empty category values with null
         for (let key in categoryData) {
             if (categoryData[key] === "") categoryData[key] = null;
         }
 
-        // Create the category in the database
         Category.create(categoryData)
             .then((data) => resolve(data))
             .catch(() => reject("Unable to create category"));
@@ -172,7 +168,7 @@ function deletePostById(id) {
       Item.destroy({ where: { id: id } })
         .then((result) => {
           if (result === 0) {
-            reject("Item not found"); // No rows were affected, meaning no item with the given ID exists
+            reject("Item not found"); 
           } else {
             resolve("Item deleted successfully");
           }

@@ -4,7 +4,7 @@
         <h2>Categories</h2>
         <hr>
         
-        <!-- Display message if no categories are found -->
+       
         {{#unless categories}}
             <div class="col-md-12 text-center">
                 <strong>{{message}}</strong>
@@ -16,7 +16,7 @@
                         <tr>
                             <th>Category ID</th>
                             <th>Category Name</th>
-                            <th>Actions</th> <!-- Actions header for the "remove" button -->
+                            <th>Actions</th> 
                         </tr>
                     </thead>
                     <tbody>
@@ -25,7 +25,7 @@
                                 <td>{{id}}</td>
                                 <td>{{category}}</td>
                                 <td>
-                                    <!-- Remove button with link to delete category -->
+                                   
                                     <a href="/categories/delete/{{id}}" class="btn btn-danger">Remove</a>
                                 </td>
                             </tr>
@@ -35,7 +35,7 @@
             </div>
         {{/unless}}
 
-        <!-- Add new category button -->
+        
         <div class="text-center mt-3">
             <a href="/categories/add" class="btn btn-primary">Add Category</a>
         </div>
